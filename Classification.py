@@ -89,6 +89,25 @@ def processTheList(fileList):
         # print ("words are ",listOfWords)
 
 
+def calculateTotalWords(spam,ham):
+    spamCount = 0
+    hamCount = 0
+    for a in spam:
+        spamCount =  spamCount + spam.get(a)
+
+    for b in ham:
+        hamCount = hamCount + ham.get(b)
+
+    return spamCount,hamCount
+
+
+def calculateConditionalProb(count, vocab):
+    cond_prob_vocab = {}
+    for a in vocab:
+        cond_prob_vocab[a]=vocab.get(a)/count
+    return cond_prob_vocab
+
+
 
 
 spam_vocab = {}
@@ -96,5 +115,9 @@ ham_vocab = {}
 
 listOfFiles = importTrainingFiles()
 processTheList(listOfFiles)
-print(ham_vocab)
-print(spam_vocab)
+spamCount, hamCount = calculateTotalWords(spam_vocab,ham_vocab)
+
+conditionalSpamProb = calculateConditionalProb(spamCount,spam_vocab)
+conditionalHamProb = calculateConditionalProb(hamCount,ham_vocab)
+
+
