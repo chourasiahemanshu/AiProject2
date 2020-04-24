@@ -107,17 +107,34 @@ def calculateConditionalProb(count, vocab):
         cond_prob_vocab[a]=vocab.get(a)/count
     return cond_prob_vocab
 
+def calculateSmoothConditionalProb(count, vocab):
+    cond_prob_vocab = {}
+    for a in vocab:
+        # Todo: need to verify the formula after smoothing
+        cond_prob_vocab[a]=vocab.get(a)+0.5/count+count*0.5
+    return cond_prob_vocab
 
 
-
+# Todo : Can i store my vocab in numpy array
 spam_vocab = {}
 ham_vocab = {}
-
+# Exctracting files
 listOfFiles = importTrainingFiles()
+# processing files and cresting the vocabulary
 processTheList(listOfFiles)
+# count the total words in each vocab
 spamCount, hamCount = calculateTotalWords(spam_vocab,ham_vocab)
 
 conditionalSpamProb = calculateConditionalProb(spamCount,spam_vocab)
 conditionalHamProb = calculateConditionalProb(hamCount,ham_vocab)
 
+# smoothing
+conditionalSpamSmoothProb = calculateSmoothConditionalProb(spamCount,spam_vocab)
+conditionalHamSmoothProb = calculateSmoothConditionalProb(hamCount,ham_vocab)
+#todo: showing result in sorted manner
 
+#Todo: testing
+
+#todo:printing result in the correct manner
+
+#todo: creating the the accuracy, precision, recall and F1-measure for each class (spam and ham), as well as a confusion matrix
