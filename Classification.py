@@ -61,20 +61,40 @@ def preprocess_string(str_arg):
 
 
 def processTheList(fileList):
-    # for x in fileList:
+    for x in fileList:
+        f = open(trainingDataPath+"/"+x, "r")
+        # f = open(trainingDataPath+"/"+"train-ham-00001.txt", "r")
+        aString =  f.read()
+        words = preprocess_string(aString)
+        listOfWords = re.split(" ", words)
+        className = re.split("-",x)[1]
+        if className=="ham":
+            for word in listOfWords:
+                if word in ham_vocab:
+                    count = ham_vocab.get(word)
+                    count = count+1
+                    ham_vocab[word] = count
+                else:
+                    ham_vocab[word] = 1
+        else:
+            for word in listOfWords:
+                if word in spam_vocab:
+                    count = spam_vocab.get(word)
+                    count = count + 1
+                    spam_vocab[word] = count
+                else:
+                    spam_vocab[word] = 1
 
-    # f = open(trainingDataPath+"/"+x, "r")
-    f = open(trainingDataPath+"/"+"train-ham-00001.txt", "r")
-
-    aString =  f.read()
-    words = preprocess_string(aString)
-
-    # className = re.split("-",x)[1]
-    print ("words are ",words)
+        # print(ham_vocab)
+        # print ("words are ",listOfWords)
 
 
 
 
+spam_vocab = {}
+ham_vocab = {}
 
 listOfFiles = importTrainingFiles()
 processTheList(listOfFiles)
+print(ham_vocab)
+print(spam_vocab)
