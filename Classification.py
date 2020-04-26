@@ -1,38 +1,3 @@
-# # Spam Detector. You have to develop a Python-based spam detector using the Na¨ıve Bayes approach.
-# # You can only use the following libraries: NumPy, math, re, sys and Matplotlib.
-# Your Python program has to be able to build a probabilistic model from the training set (available on
-# Moodle). Your code must parse the files in the training set and build a vocabulary with all the words
-# it contains. Then, for each word, compute their frequencies and probabilities for each class (class ham
-# and class spam).
-# To process the texts, fold all characters to lowercase, then tokenize them using the regular expression
-# re.split(’\[\^a-zA-Z\]’,aString) and use the set of resulting words as your vocabulary.
-# For each word wi
-# in the training set, save its frequency and its conditional probability for each class:
-# P(wi
-# |ham) and P(wi
-# |spam). These probabilities must be smoothed using the ‘add δ’ method, with
-# δ = 0.5. To avoid arithmetic underflow, work in log10 space.
-# Save your model in a text file called model.txt. The format of this file must be the following:
-# 1. A line counter i, followed by 2 spaces.
-# 2. The word wi
-# , followed by 2 spaces.
-# 3. The frequency of wi
-# in the class ham, followed by 2 spaces.
-# 4. The smoothed conditional probability of wi
-# in the class ham −P(wi
-# |ham), followed by 2 spaces.
-# 5. The frequency of wi
-# in the class spam, followed by 2 spaces.
-# 6. The smoothed conditional probability of wi
-# in spam −P(wi
-# |spam), followed by a carriage return.
-# Note that the file must be sorted alphabetically. For example, your file model.txt could look like the
-# following:
-# 1 abc 3 0.003 40 0.4
-# 2 airplane 3 0.003 40 0.4
-# 3 password 40 0.4 50 0.03
-# 4 zucchini 0.7 0.003 0 0.000001
-
 import os
 import re
 
@@ -41,7 +6,7 @@ testingDataPath ="./projectDetails/test"
 
 def importTrainingFiles():
     listOfFiles = os.listdir("./projectDetails/train")
-    print(listOfFiles)
+    # print(listOfFiles)
     return listOfFiles
 
 
@@ -59,8 +24,40 @@ def preprocess_string(str_arg):
     return cleaned_str
 
 
+# Todo: Need help with deciding what value counts do we need
+# def processTheList(fileList):
+#     for x in fileList:
+#         f = open(trainingDataPath+"/"+x, "r")
+#         # f = open(trainingDataPath+"/"+"train-ham-00001.txt", "r")
+#         aString =  f.read()
+#         words = preprocess_string(aString)
+#         listOfWords = re.split(" ", words)
+#         className = re.split("-",x)[1]
+#         if className=="ham":
+#             for word in listOfWords:
+#                 if word in ham_vocab:
+#                     count = ham_vocab.get(word)
+#                     count = count+1
+#                     ham_vocab[word] = count
+#                 else:
+#                     ham_vocab[word] = 1
+#         else:
+#             for word in listOfWords:
+#                 if word in spam_vocab:
+#                     count = spam_vocab.get(word)
+#                     count = count + 1
+#                     spam_vocab[word] = count
+#                 else:
+#                     spam_vocab[word] = 1
+
+
+# Todo: Need help with deciding what value counts do we need
 
 def processTheList(fileList):
+    total_spam_word_count = 0
+    total_ham_word_count = 0
+    total_ham_files =0
+    total_spam_files = 0
     for x in fileList:
         f = open(trainingDataPath+"/"+x, "r")
         # f = open(trainingDataPath+"/"+"train-ham-00001.txt", "r")
@@ -68,22 +65,25 @@ def processTheList(fileList):
         words = preprocess_string(aString)
         listOfWords = re.split(" ", words)
         className = re.split("-",x)[1]
-        if className=="ham":
-            for word in listOfWords:
-                if word in ham_vocab:
-                    count = ham_vocab.get(word)
-                    count = count+1
-                    ham_vocab[word] = count
-                else:
-                    ham_vocab[word] = 1
+        vocab = {}
+        word_count = 0
+        for word in listOfWords:
+            word_count = word_count+1
+            if word in vocab:
+                count = vocab.get(word)
+                count = count + 1
+                vocab[word] = count
+            else:
+                vocab[word] = 1
+        if className == "ham":
+            total_ham_files = total_ham_files+1
+            total_ham_word_count = total_ham_word_count +word_count
         else:
-            for word in listOfWords:
-                if word in spam_vocab:
-                    count = spam_vocab.get(word)
-                    count = count + 1
-                    spam_vocab[word] = count
-                else:
-                    spam_vocab[word] = 1
+            total_spam_files = total_spam_files + 1
+            total_spam_word_count = total_spam_word_count + word_count
+
+        return vocab , total_spam_word_count , total_ham_word_count, total_spam_files , total_ham_files
+
 
         # print(ham_vocab)
         # print ("words are ",listOfWords)
@@ -114,6 +114,8 @@ def calculateSmoothConditionalProb(count, vocab):
         cond_prob_vocab[a]=vocab.get(a)+0.5/count+count*0.5
     return cond_prob_vocab
 
+# def printTrainingData():
+
 
 # Todo : Can i store my vocab in numpy array
 spam_vocab = {}
@@ -121,16 +123,16 @@ ham_vocab = {}
 # Exctracting files
 listOfFiles = importTrainingFiles()
 # processing files and cresting the vocabulary
-processTheList(listOfFiles)
+vocabulary , spam_word_count , ham_word_count , spam_file_count , ham_file_count = processTheList(listOfFiles)
 # count the total words in each vocab
-spamCount, hamCount = calculateTotalWords(spam_vocab,ham_vocab)
+# spamCount, hamCount = calculateTotalWords(spam_vocab,ham_vocab)
 
-conditionalSpamProb = calculateConditionalProb(spamCount,spam_vocab)
-conditionalHamProb = calculateConditionalProb(hamCount,ham_vocab)
+conditionalSpamProb = calculateConditionalProb(spam_word_count,spam_vocab)
+conditionalHamProb = calculateConditionalProb(ham_word_count,ham_vocab)
 
 # smoothing
-conditionalSpamSmoothProb = calculateSmoothConditionalProb(spamCount,spam_vocab)
-conditionalHamSmoothProb = calculateSmoothConditionalProb(hamCount,ham_vocab)
+conditionalSpamSmoothProb = calculateSmoothConditionalProb(spam_word_count,vocabulary)
+conditionalHamSmoothProb = calculateSmoothConditionalProb(ham_word_count,vocabulary)
 #todo: showing result in sorted manner
 
 #Todo: testing
