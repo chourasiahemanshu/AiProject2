@@ -33,10 +33,10 @@ def calculateMetrics(results):
         else :
             FN = FN + 1
             
-    accuracy = TP+TN / (TP+FP+FN+TN)
+    accuracy = (TP+TN) / (TP+FP+FN+TN)
     precision = TP/ (TP+FP)
     recall = TP / (TP+FN)
-    F1_Score = 2*(recall * precision) / (recall + precision)
+    F1_Score = (2*(recall * precision)) / (recall + precision)
     return TP, FP, TN, FN , accuracy, precision, recall, F1_Score
 
 # accuracy = TP+TN / TP+FP+FN+TN
