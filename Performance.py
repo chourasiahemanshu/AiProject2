@@ -64,6 +64,10 @@ def plotTable(TP, TN, FP ,FN):
 
     columns = ['Ham', 'Spam']
     rows = ['Ham','Spam']
-    confusion_matrix = plt.table(cellText = confusion_matrix_data , rowLabels = rows, colLabels = columns)
+    fig = plt.figure()
+    tbl = fig.add_subplot(1,1,1)
+    confusion_matrix = plt.table(cellText = confusion_matrix_data , rowLabels = rows, colLabels = columns, loc='center')
+    confusion_matrix.scale(0.5,1)
+    tbl.axis('off')
     plt.title('Confusion Matrix')
     plt.show()
