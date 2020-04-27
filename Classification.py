@@ -63,7 +63,6 @@ def processTheList(fileList):
     total_spam_files = 0
     vocab = {}
     for x in fileList:
-
         f = open(trainingDataPath+"/"+x, encoding='cp1252',errors='ignore')
         # f = open(trainingDataPath+"/"+"train-ham-00001.txt",, "r")
         aString =  f.read()
@@ -113,7 +112,17 @@ def calculateConditionalProb(ham_count, spam_count,vocab):
     return cond_prob_vocab
 
 #         # Todo: need to verify the formula after smoothing
-
+def printResultOfModal(cond_vocab,vocab):
+    keys = sorted(cond_vocab.keys())
+    size_of_vocab = len(keys)
+    index =1
+    f = open("model.txt", "a")
+    for word in keys:
+        keyWord = vocab.get(word)
+        value =str(index)+"  "+str(word)+"  "+str(keyWord[0])+"  "+str(cond_vocab.get(word)[0])+"  "+str(keyWord[1])+"  "+str(cond_vocab.get(word)[1])+"\n"
+        f.write(value)
+        index+=1
+    f.close()
 
 def testModel(fileList,vocab,ham_class_prob, spam_class_prob):
     testingResult = {}
@@ -155,6 +164,7 @@ classProbOfSpam =  spam_file_count/(spam_file_count+ham_file_count)
 classProbOfHam =  ham_file_count/(spam_file_count+ham_file_count)
 
 #todo: showing result in sorted manner
+printResultOfModal(conditionalProb,vocabulary)
 
 #Todo: testing
 # you need to delete 3 files. there is problem of encoding test-spam-65,227,376
