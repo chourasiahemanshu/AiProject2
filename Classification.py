@@ -1,6 +1,8 @@
 import os
 import re
 import math
+from Performance import *
+
 trainingDataPath="./projectDetails/train"
 testingDataPath ="./projectDetails/test"
 
@@ -127,7 +129,7 @@ def testModel(fileList,vocab,ham_class_prob, spam_class_prob):
         for word in listOfWords:
             if(vocab.get(word)):
                 prob_of_beig_ham = prob_of_beig_ham + math.log(vocab.get(word)[0])
-                prob_of_beig_spam = prob_of_beig_spam + math.log(vocab.get(word)[1])
+                prob_of_beig_spam = prob_of_beig_spam + math.log(vocab.get(word)[1]) 
 
         if(prob_of_beig_ham > prob_of_beig_spam):
             myclass = "ham"
@@ -146,7 +148,7 @@ listOfFiles = importFiles(trainingDataPath)
 vocabulary , spam_word_count , ham_word_count , spam_file_count , ham_file_count = processTheList(listOfFiles)
 
 # vocabulary is dictionary: with word as key  and value is a [ham_word_count , spam_word_count]
-print(vocabulary)
+# print(vocabulary)
 conditionalProb = calculateConditionalProb(ham_word_count,spam_word_count,vocabulary)
 classProbOfSpam =  spam_file_count/(spam_file_count+ham_file_count)
 classProbOfHam =  ham_file_count/(spam_file_count+ham_file_count)
@@ -157,7 +159,7 @@ classProbOfHam =  ham_file_count/(spam_file_count+ham_file_count)
 # you need to delete 3 files. there is problem of encoding test-spam-65,227,376
 testingFileList =  importFiles(testingDataPath)
 output = testModel(testingFileList,conditionalProb,classProbOfHam,classProbOfSpam)
-print(output)
+# print(output)
 right = 0
 wrong =0
 for eachFile in output:
@@ -169,8 +171,18 @@ for eachFile in output:
 print("Right:",right)
 print("wrong:",wrong)
 
+TP, FP, TN, FN, accuracy, precision, recall, F1_Score = calculateMetrics(output)
 
+print("True positive :", TP)
+print("False positive : ",FP)
+print("true negative : ",TN)
+print("false negative : ",FN)
+print("accuracy : ",accuracy)
+print("precision : ",precision)
+print("recall : ",recall)
+print("f1_score : ",F1_Score)
 
+plotTable(TP,TN,FP, FN)
 
 #todo:printing result in the correct manner
 
