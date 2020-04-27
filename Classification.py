@@ -1,6 +1,7 @@
 import os
 import re
 import math
+import io
 from Performance import *
 
 trainingDataPath="./projectDetails/train"
@@ -62,8 +63,9 @@ def processTheList(fileList):
     total_spam_files = 0
     vocab = {}
     for x in fileList:
-        f = open(trainingDataPath+"/"+x, "r")
-        # f = open(trainingDataPath+"/"+"train-ham-00001.txt", "r")
+
+        f = open(trainingDataPath+"/"+x, encoding='cp1252',errors='ignore')
+        # f = open(trainingDataPath+"/"+"train-ham-00001.txt",, "r")
         aString =  f.read()
         words = preprocess_string(aString)
         listOfWords = re.split(" ", words)
@@ -111,13 +113,12 @@ def calculateConditionalProb(ham_count, spam_count,vocab):
     return cond_prob_vocab
 
 #         # Todo: need to verify the formula after smoothing
-#         cond_prob_vocab[a]=vocab.get(a)+0.5/count+count*0.5
 
 
 def testModel(fileList,vocab,ham_class_prob, spam_class_prob):
     testingResult = {}
     for x in fileList:
-        f = open(testingDataPath+"/"+x, "r")
+        f = open(testingDataPath+"/"+x,encoding='cp1252',errors='ignore')
         # f = open(trainingDataPath+"/"+"train-ham-00001.txt", "r")
         print(x)
         aString =  f.read()
@@ -186,4 +187,3 @@ plotTable(TP,TN,FP, FN)
 
 #todo:printing result in the correct manner
 
-#todo: creating the the accuracy, precision, recall and F1-measure for each class (spam and ham), as well as a confusion matrix
