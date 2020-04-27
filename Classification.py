@@ -1,11 +1,11 @@
 import os
 import re
-
+import math
 trainingDataPath="./projectDetails/train"
 testingDataPath ="./projectDetails/test"
 
-def importTrainingFiles():
-    listOfFiles = os.listdir("./projectDetails/train")
+def importFiles(path):
+    listOfFiles = os.listdir(path)
     # print(listOfFiles)
     return listOfFiles
 
@@ -103,8 +103,8 @@ def calculateConditionalProb(ham_count, spam_count,vocab):
     vocab_keys = vocab.keys()
     total_unique_words = len(vocab.keys())
     for word in  vocab_keys:
-        ham_cond_prob=vocab.get(word)[0]+0.5/(ham_count+(total_unique_words*0.5))
-        spam_cond_prob=vocab.get(word)[1]+0.5/(spam_count+(total_unique_words*0.5))
+        ham_cond_prob=(vocab.get(word)[0]+0.5)/(ham_count+(total_unique_words*0.5))
+        spam_cond_prob=(vocab.get(word)[1]+0.5)/(spam_count+(total_unique_words*0.5))
         cond_prob_vocab[word]=[ham_cond_prob,spam_cond_prob]
     return cond_prob_vocab
 
@@ -112,11 +112,35 @@ def calculateConditionalProb(ham_count, spam_count,vocab):
 #         cond_prob_vocab[a]=vocab.get(a)+0.5/count+count*0.5
 
 
+def testModel(fileList,vocab,ham_class_prob, spam_class_prob):
+    testingResult = {}
+    for x in fileList:
+        f = open(testingDataPath+"/"+x, "r")
+        # f = open(trainingDataPath+"/"+"train-ham-00001.txt", "r")
+        print(x)
+        aString =  f.read()
+        words = preprocess_string(aString)
+        listOfWords = re.split(" ", words)
+        className = re.split("-",x)[1]
+        prob_of_beig_ham = math.log(ham_class_prob)
+        prob_of_beig_spam = math.log(spam_class_prob)
+        for word in listOfWords:
+            if(vocab.get(word)):
+                prob_of_beig_ham = prob_of_beig_ham + math.log(vocab.get(word)[0])
+                prob_of_beig_spam = prob_of_beig_spam + math.log(vocab.get(word)[1])
 
+        if(prob_of_beig_ham > prob_of_beig_spam):
+            myclass = "ham"
+        else:
+            myclass = "spam"
+
+        testingResult[x]= [x,myclass,prob_of_beig_ham,prob_of_beig_spam,className, ("right" if (myclass==className) else "wrong")]
+
+    return testingResult
 
 
 # Exctracting files
-listOfFiles = importTrainingFiles()
+listOfFiles = importFiles(trainingDataPath)
 # processing files and cresting the vocabulary
 
 vocabulary , spam_word_count , ham_word_count , spam_file_count , ham_file_count = processTheList(listOfFiles)
@@ -130,6 +154,23 @@ classProbOfHam =  ham_file_count/(spam_file_count+ham_file_count)
 #todo: showing result in sorted manner
 
 #Todo: testing
+# you need to delete 3 files. there is problem of encoding test-spam-65,227,376
+testingFileList =  importFiles(testingDataPath)
+output = testModel(testingFileList,conditionalProb,classProbOfHam,classProbOfSpam)
+print(output)
+right = 0
+wrong =0
+for eachFile in output:
+    if( output.get(eachFile)[5]=="right"):
+        right+=1
+    else:
+        wrong+=1
+
+print("Right:",right)
+print("wrong:",wrong)
+
+
+
 
 #todo:printing result in the correct manner
 
