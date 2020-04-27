@@ -150,6 +150,18 @@ def testModel(fileList,vocab,ham_class_prob, spam_class_prob):
 
     return testingResult
 
+def printOutput(result):
+    keys =  sorted(output.keys())
+    index = 1
+    f = open("result.txt", "a")
+    for file in keys:
+        detail =result.get(file)
+        val = str(index)+"  "+str(detail[0])+"  "+ str(detail[1])+"  "+str(detail[2])+"  "+str(detail[3])+"  "+str(detail[4])+"  "+str(detail[5])+"\n"
+        f.write(val)
+        index += 1
+    f.close()
+
+
 
 # Exctracting files
 listOfFiles = importFiles(trainingDataPath)
@@ -179,6 +191,7 @@ for eachFile in output:
     else:
         wrong+=1
 
+printOutput(output)
 print("Right:",right)
 print("wrong:",wrong)
 
