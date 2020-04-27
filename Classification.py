@@ -100,11 +100,12 @@ def processTheList(fileList):
 
 def calculateConditionalProb(ham_count, spam_count,vocab):
     cond_prob_vocab = {}
-    sorted_vocab_keys = sorted (vocab.keys())
-    for a in  sorted_vocab_keys:
-        ham_cond_prob=vocab.get(a)[0]/ham_count
-        spam_cond_prob=vocab.get(a)[1]/spam_count
-        cond_prob_vocab[a]=[ham_cond_prob,spam_cond_prob]
+    vocab_keys = vocab.keys()
+    total_unique_words = len(vocab.keys())
+    for word in  vocab_keys:
+        ham_cond_prob=vocab.get(word)[0]+0.5/(ham_count+(total_unique_words*0.5))
+        spam_cond_prob=vocab.get(word)[1]+0.5/(spam_count+(total_unique_words*0.5))
+        cond_prob_vocab[word]=[ham_cond_prob,spam_cond_prob]
     return cond_prob_vocab
 
 #         # Todo: need to verify the formula after smoothing
@@ -123,6 +124,8 @@ vocabulary , spam_word_count , ham_word_count , spam_file_count , ham_file_count
 # vocabulary is dictionary: with word as key  and value is a [ham_word_count , spam_word_count]
 print(vocabulary)
 conditionalProb = calculateConditionalProb(ham_word_count,spam_word_count,vocabulary)
+classProbOfSpam =  spam_file_count/(spam_file_count+ham_file_count)
+classProbOfHam =  ham_file_count/(spam_file_count+ham_file_count)
 
 #todo: showing result in sorted manner
 
